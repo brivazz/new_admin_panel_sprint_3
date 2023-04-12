@@ -1,0 +1,48 @@
+version: '3'
+services:
+  elasticsearch:
+    image: 'ghcr.io/yp-middle-python-24/elasticsearch:8.7.0'
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - '9200:9200'
+    volumes:
+      - elasticdata:/opt/app/elasticsearch/data
+
+  redis:
+    image: 'redis:7.0.10-alpine'
+    env_file:
+      - .env
+    depends_on:
+      - elasticsearch
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redisdata:/data
+
+  postgres:
+    image: 'postgres:13'
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    restart: always
+
+  etl:
+    build:
+      context: ./postgres_to_es
+    env_file:
+      - .env
+    depends_on:
+      - elasticsearch
+      - redis
+    restart: always
+
+volumes:
+  elasticdata:
+  redisdata:
+  postgres_volume:
