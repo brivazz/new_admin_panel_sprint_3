@@ -5,10 +5,13 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+    env_file:
+      - .env
     ports:
       - '9200:9200'
     volumes:
       - elasticdata:/opt/app/elasticsearch/data
+    restart: always
 
   redis:
     image: 'redis:7.0.10-alpine'
@@ -16,20 +19,19 @@ services:
       - .env
     depends_on:
       - elasticsearch
-    restart: always
-    ports:
-      - '6379:6379'
     volumes:
       - redisdata:/data
+    restart: always
 
   postgres:
     image: 'postgres:13'
-    volumes:
-      - postgres_volume:/var/lib/postgresql/data/
     env_file:
       - .env
     depends_on:
       - redis
+    volumes:
+      - ./pg_gump.sql:/docker-entrypoint-initdb.d/pg_gump.sql
+      - postgres_volume:/var/lib/postgresql/data/
     restart: always
 
   etl:
@@ -40,6 +42,7 @@ services:
     depends_on:
       - elasticsearch
       - redis
+      - postgres
     restart: always
 
 volumes:

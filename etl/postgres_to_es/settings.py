@@ -33,12 +33,12 @@ class AppConfig(BaseSettings):
     elastic_index: str = Field(env='ELASTICSEARCH_INDEX')
 
 
-POSTGRES_DSN = PostgresDSN()
-ELASTIC_CONFIG = ElasticConfig()
-REDIS_CONFIG = RedisConfig()
-APP_CONFIG = AppConfig()
+postgres_dsn = PostgresDSN()
+elastic_config = ElasticConfig()
+redis_config = RedisConfig()
+app_config = AppConfig()
 
-LOGGER_SETTINGS = {
+logger_settings = {
     'format': '%(asctime)s - %(name)s.%(funcName)s:%(lineno)d - %(levelname)s - %(message)s',
     'datefmt': "%Y-%m-%d %H:%M:%S",
     'level': logging.INFO,

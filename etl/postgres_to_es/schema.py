@@ -1,5 +1,4 @@
 import uuid
-from typing import List, Optional
 from dataclasses import dataclass
 
 
@@ -15,13 +14,13 @@ class PersonInFilm(UUIDModel):
 @dataclass
 class ESMovies:
     id: uuid.UUID
-    imdb_rating: Optional[float] = None
-    genre: Optional[List[str]] = None
-    title: Optional[str] = None
-    description: Optional[str] = None
-    director: Optional[List[str]] = None
-    actors_names: Optional[List[str]] = None
-    writers_names: Optional[List[str]] = None
-    actors: Optional[List[PersonInFilm]] = None
-    writers: Optional[List[PersonInFilm]] = None
-    modified: Optional[str] = None
+    imdb_rating: float | None
+    genre: list[str] | None
+    title: str | None
+    description: str | None
+    director: list[str] | None
+    actors_names: list[str] | None
+    writers_names: list[str] | None
+    actors: list[PersonInFilm] | None
+    writers: list[PersonInFilm] | None
+    modified: str | None

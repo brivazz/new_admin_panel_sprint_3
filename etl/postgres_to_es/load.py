@@ -1,10 +1,9 @@
-import json
+import time
 import logging
-from dataclasses import asdict
-from typing import List, Iterator, Optional
+from typing import List, Iterator, Tuple, Optional
 
 import elasticsearch
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 
 from backoff_decorator import backoff
 from settings import ElasticConfig
@@ -62,39 +61,41 @@ class ElasticLoader:
                 pass
 
     @backoff(start_sleep_time=0.5)
-    def bulk_update(self, docs: Iterator[List[ESMovies]]) -> None:
-        """Загружает данные в ES используя итератор"""
-        body = ''
+    def generate_docs(
+        self, docs: Iterator[List[ESMovies]]
+    ) -> Iterator[Tuple[dict, str]]:
+        """
+        Возвращает итератор документов для ES.
+        Записывает в стэйт дату последнего изменения, последней записи.
+        """
+        modified = ''
         for doc in docs:
-
-            doc = asdict(doc)
             modified = doc.pop('modified')
+            yield doc
 
-            index = {'index': {'_index': self.index, '_id': doc['id']}}
-            body += json.dumps(index) + '\n' + json.dumps(doc) + '\n'
-
+        # Записываем в стейт только если у нас были какие-то записи
+        if modified:
             self.state.set_state('modified', str(modified))
 
-        if body:
-            try:
-                results = self.elastic_connection.bulk(body)
+    @backoff(start_sleep_time=0.5)
+    def bulk_update(self, docs: Iterator[dict], itersize: int,) -> None:
+        """Загружает данные в ES используя итератор"""
+        t = time.perf_counter()
 
-                params = {'bytes': 'b', 'format': 'json'}
-                res = self.elastic_conn.cat.indices(
-                        self.index,
-                        params=params)
-                logger.info(
-                    'Successful updated. Doc\'s count: %s', res[0]['docs.count']
-                )
-                if results['errors']:
-                    error = [
-                        result['index'] for result in results['items']
-                        if result['index']['status'] != 200
-                    ]
-                    logger.info(error)
-                    return
-            except Exception:
-                return
+        docs_generator = self.generate_docs(docs)
+        lines, _ = helpers.bulk(
+            client=self.elastic_connection,
+            actions=docs_generator,
+            index=self.index,
+            chunk_size=itersize
+        )
+
+        elapsed_time = time.perf_counter() - t
+
+        if lines == 0:
+            logger.info("Nothing to update for index %s", self.index)
         else:
-            logger.info("Nothing to update for index: %s", self.index)
-            return
+            logger.info(
+                "%s lines saved in %s for index %s",
+                lines, elapsed_time, self.index
+            )
