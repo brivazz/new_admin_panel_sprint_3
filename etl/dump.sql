@@ -11,7 +11,7 @@ SET standard_conforming_strings = on;
 -- Drop databases (except postgres and template1)
 --
 
-DROP DATABASE movies_database;
+-- DROP DATABASE movies_database;
 
 
 
@@ -20,14 +20,14 @@ DROP DATABASE movies_database;
 -- Drop roles
 --
 
-DROP ROLE app;
+-- DROP ROLE app;
 
 
 --
 -- Roles
 --
 
-CREATE ROLE app;
+-- CREATE ROLE app;
 ALTER ROLE app WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION BYPASSRLS PASSWORD 'md5c9377313baea21e871f6c06c4e62810d';
 --
 -- User Configurations
@@ -159,7 +159,7 @@ SET row_security = off;
 -- Name: movies_database; Type: DATABASE; Schema: -; Owner: app
 --
 
-CREATE DATABASE movies_database WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'en_US.utf8';
+-- CREATE DATABASE movies_database WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'en_US.utf8';
 
 
 ALTER DATABASE movies_database OWNER TO app;

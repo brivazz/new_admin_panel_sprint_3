@@ -1,6 +1,6 @@
 import logging
 import time
-from datetime import datetime
+from datetime import datetime, MINYEAR, timezone
 
 from redis import Redis
 
@@ -39,7 +39,10 @@ if __name__ == '__main__':
 
     while True:
         logger.info('Starting etl...')
-        modified = state.get_state('modified', default=str(datetime.min))
+        modified = state.get_state(
+            'modified',
+            default=str(datetime(MINYEAR, 1, 1, tzinfo=timezone.utc))
+        )
 
         try:
             query = get_query(modified)

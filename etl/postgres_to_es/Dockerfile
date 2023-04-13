@@ -1,6 +1,6 @@
 FROM python:3.10-alpine
 
-WORKDIR /opt/etl
+WORKDIR /etl
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -16,7 +16,7 @@ RUN addgroup --gid 1001 --system app \
     && adduser --no-create-home \
     --shell /bin/false --disabled-password \
     --uid 1001 --system app \
-    && chown -R app:app /opt/etl
+    && chown -R app:app /etl
 
 USER app
 

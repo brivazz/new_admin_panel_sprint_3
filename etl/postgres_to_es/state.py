@@ -1,5 +1,4 @@
 import logging
-from typing import Any
 
 import redis
 from redis import Redis
@@ -47,12 +46,12 @@ class State:
         return Redis(**self.config.dict())
 
     @backoff()
-    def set_state(self, key: str, value: Any) -> None:
+    def set_state(self, key: str, value: str) -> None:
         """Установить состояние для определённого ключа."""
-        self.redis_connection.set(key, value)
+        self.redis_connection.set(key, value.encode())
 
     @backoff()
-    def get_state(self, key: str, default: str | None) -> Any:
+    def get_state(self, key: str, default: str | None) -> str:
         """Получить состояние по определённому ключу."""
         state = self.redis_connection.get(key)
         if state:
