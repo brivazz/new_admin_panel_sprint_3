@@ -16,12 +16,8 @@
 Так же есть postman_tests.json, для тестирования результата работы etl
 
 ## Dev:
-1. Установить зависимости из requirements.txt
-```
-$ pip install -r requirements.txt
-```
 
-2. Создать .env файл на основе .env.example
+Необходимо создать .env файл на основе .env.example
 
 ## Запуск приложения в Docker
 
